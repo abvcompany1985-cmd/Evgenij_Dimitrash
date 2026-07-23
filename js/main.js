@@ -109,13 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const telegram = data.get('telegram');
     const tariff = data.get('tariff');
 
-    const text = `📩 Новая заявка с лендинга!\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n💬 Telegram/WhatsApp: ${telegram || '—'}\n📦 Тариф: ${tariff}`;
-
     try {
-      const res = await fetch('https://api.telegram.org/bot8778855111:AAFTUR4rxggHz5R80d73zVSm9oNpqjvvf1g/sendMessage', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: 1276131926, text: text, parse_mode: 'HTML' })
+        body: JSON.stringify({ name, phone, telegram, tariff })
       });
       if (res.ok) {
         alert(`Спасибо, ${name}! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.`);
