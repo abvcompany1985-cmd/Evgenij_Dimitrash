@@ -95,14 +95,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   fadeElements.forEach(el => observer.observe(el));
 
-  // Form submission
+  // Form submission → Telegram bot
   const form = document.getElementById('application-form');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = form.querySelector('.form__submit');
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+
     const data = new FormData(form);
     const name = data.get('name');
-    alert(`Спасибо, ${name}! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.`);
-    form.reset();
+    const phone = data.get('phone');
+    const telegram = data.get('telegram');
+    const tariff = data.get('tariff');
+
+    const text = `📩 Новая заявка с лендинга!\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n💬 Telegram/WhatsApp: ${telegram || '—'}\n📦 Тариф: ${tariff}`;
+
+    try {
+      const res = await fetch('https://api.telegram.org/bot8778855111:AAFTUR4rxggHz5R80d73zVSm9oNpqjvvf1g/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: 1276131926, text: text, parse_mode: 'HTML' })
+      });
+      if (res.ok) {
+        alert(`Спасибо, ${name}! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.`);
+        form.reset();
+      } else {
+        alert('Произошла ошибка при отправке. Попробуйте ещё раз.');
+      }
+    } catch {
+      alert('Ошибка сети. Проверьте подключение к интернету.');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Оставить заявку';
   });
 
 });
