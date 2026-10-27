@@ -1,0 +1,5 @@
+# Dev tooling
+.claude/
+
+# Large media — deployed via SFTP, not git
+video/*.mp4
