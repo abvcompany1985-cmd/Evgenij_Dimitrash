@@ -307,4 +307,38 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.textContent = 'Оставить заявку';
   });
 
+  // ── Scroll progress bar ──
+  const scrollProgress = document.getElementById('scrollProgress');
+  if (scrollProgress) {
+    const updateProgress = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const ratio = max > 0 ? h.scrollTop / max : 0;
+      scrollProgress.style.width = (ratio * 100) + '%';
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+  }
+
+  // ── Cookie consent ──
+  const cookieBanner = document.getElementById('cookieBanner');
+  if (cookieBanner) {
+    let consent = null;
+    try { consent = localStorage.getItem('cookie-consent'); } catch {}
+    if (!consent) {
+      document.body.classList.add('cookie-open');
+      setTimeout(() => cookieBanner.classList.add('cookie--visible'), 900);
+    }
+    const closeCookie = (value) => {
+      try { localStorage.setItem('cookie-consent', value); } catch {}
+      cookieBanner.classList.remove('cookie--visible');
+      document.body.classList.remove('cookie-open');
+    };
+    const acceptBtn = document.getElementById('cookieAccept');
+    const declineBtn = document.getElementById('cookieDecline');
+    if (acceptBtn) acceptBtn.addEventListener('click', () => closeCookie('accepted'));
+    if (declineBtn) declineBtn.addEventListener('click', () => closeCookie('necessary'));
+  }
+
 });

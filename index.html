@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Архитектура личной свободы — закрытая онлайн-группа Евгения Димитраша</title>
   <meta name="description" content="Закрытая онлайн-группа Евгения Димитраша «Архитектура личной свободы». Глубокая практическая работа с отношениями, самоценностью, страхами и личными границами в камерной группе женщин. Старт 21 ноября, до 12 участниц.">
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- Scroll progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- HEADER -->
   <header class="header">
@@ -581,6 +584,17 @@
   <!-- Sticky mobile CTA -->
   <a href="#form" class="mobile-cta">Оставить заявку на участие</a>
 
-  <script src="js/main.js?v=5"></script>
+  <!-- Cookie consent -->
+  <div class="cookie" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Уведомление об использовании файлов cookie">
+    <div class="cookie__inner">
+      <p class="cookie__text">Мы используем файлы cookie, чтобы сайт работал корректно и&nbsp;удобно, а&nbsp;также для аналитики. Продолжая пользоваться сайтом, вы соглашаетесь с&nbsp;<a href="privacy.html" target="_blank">политикой конфиденциальности</a>.</p>
+      <div class="cookie__actions">
+        <button class="cookie__btn cookie__btn--decline" id="cookieDecline" type="button">Только необходимые</button>
+        <button class="cookie__btn cookie__btn--accept" id="cookieAccept" type="button">Принять</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js?v=6"></script>
 </body>
 </html>
