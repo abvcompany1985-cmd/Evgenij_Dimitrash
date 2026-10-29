@@ -2237,7 +2237,11 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height
 .advantages__quote {
   max-width: 820px;
   margin: 0 auto;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow);
 }
+.advantages__quote p { color: var(--color-text); }
+.advantages__quote:hover { border-left-color: var(--color-accent-hover); }
 
 /* ----- Block 7: About extras ----- */
 .about__lead {
@@ -2577,3 +2581,5 @@ body.cookie-open .mobile-cta { display: none; }
   .cookie__actions { justify-content: stretch; }
   .cookie__btn { flex: 1; }
 }
+
+.booking__cal-arrow:disabled { opacity: 0.3; cursor: default; pointer-events: none; }

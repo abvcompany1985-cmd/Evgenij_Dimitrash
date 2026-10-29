@@ -49,10 +49,18 @@ document.addEventListener('DOMContentLoaded', () => {
   fadeElements.forEach(el => observer.observe(el));
 
   // ── Booking widget ──────────────────────────────────────────────────────
-  const AVAILABLE_DATES = new Set([
-    '2026-11-05','2026-11-07','2026-11-10','2026-11-12',
-    '2026-11-14','2026-11-17','2026-11-19'
-  ]);
+  // Доступные даты: вторник и четверг, 10:00–12:00 (МСК), до конца 2026 года.
+  // ВАЖНО: те же правила продублированы в боте (/opt/dimitrash-bot/bot.py).
+  const BOOKING_DOWS = [2, 4]; // 2 = вторник, 4 = четверг
+  const BOOKING_END = new Date(2026, 11, 31); // 31 декабря 2026
+  const toDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const AVAILABLE_DATES = new Set();
+  (function buildAvailableDates() {
+    const d = new Date(); d.setHours(0, 0, 0, 0);
+    for (; d <= BOOKING_END; d.setDate(d.getDate() + 1)) {
+      if (BOOKING_DOWS.includes(d.getDay())) AVAILABLE_DATES.add(toDateStr(d));
+    }
+  })();
   const BOOKING_SLOTS = ['10:00','10:30','11:00','11:30'];
   const MONTH_NAMES = ['Январь','Февраль','Март','Апрель','Май','Июнь',
     'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -61,7 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
     'июля','августа','сентября','октября','ноября','декабря'];
 
   const booking = { duration: null, date: null, dateLabel: '', time: null, name: '', phone: '' };
-  let calYear = 2026, calMonth = 10; // November (0-indexed)
+  // Стартовый месяц календаря — текущий, в пределах окна записи (до декабря 2026).
+  const CAL_MIN = { y: 2026, m: 9 }, CAL_MAX = { y: 2026, m: 11 }; // октябрь–декабрь 2026 (0-indexed)
+  let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+  if (calYear * 12 + calMonth < CAL_MIN.y * 12 + CAL_MIN.m) { calYear = CAL_MIN.y; calMonth = CAL_MIN.m; }
+  if (calYear * 12 + calMonth > CAL_MAX.y * 12 + CAL_MAX.m) { calYear = CAL_MAX.y; calMonth = CAL_MAX.m; }
   const fullyBookedDates = new Set();
 
   const calGrid = document.getElementById('calGrid');
@@ -88,11 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calendar navigation
     document.getElementById('calPrev').addEventListener('click', () => {
+      if (calYear * 12 + calMonth <= CAL_MIN.y * 12 + CAL_MIN.m) return;
       calMonth--;
       if (calMonth < 0) { calMonth = 11; calYear--; }
       renderCalendar();
     });
     document.getElementById('calNext').addEventListener('click', () => {
+      if (calYear * 12 + calMonth >= CAL_MAX.y * 12 + CAL_MAX.m) return;
       calMonth++;
       if (calMonth > 11) { calMonth = 0; calYear++; }
       renderCalendar();
@@ -114,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function preloadBookedDates() {
-    for (const dateStr of AVAILABLE_DATES) {
+    await Promise.all([...AVAILABLE_DATES].map(async (dateStr) => {
       try {
         const res = await fetch(`/api/booking/slots?date=${dateStr}`);
         if (res.ok) {
@@ -124,12 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       } catch {}
-    }
+    }));
     renderCalendar();
   }
 
   function renderCalendar() {
     calMonthEl.textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+    const prevBtn = document.getElementById('calPrev'), nextBtn = document.getElementById('calNext');
+    if (prevBtn) prevBtn.disabled = calYear * 12 + calMonth <= CAL_MIN.y * 12 + CAL_MIN.m;
+    if (nextBtn) nextBtn.disabled = calYear * 12 + calMonth >= CAL_MAX.y * 12 + CAL_MAX.m;
     calGrid.innerHTML = '';
     const firstDay = new Date(calYear, calMonth, 1);
     let startDow = firstDay.getDay();
